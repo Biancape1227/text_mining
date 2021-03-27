@@ -1,0 +1,204 @@
+library(dplyr)
+library(tidytext)
+library(ggplot2)
+library(janeaustenr)
+library(dplyr)
+library(stringr)
+library(tm)
+library(quanteda)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+
+#Masoquismo
+
+maso <- c(
+   "Tú eras todo para mi",
+  "yo no creía más que en ti",
+  "te llegaste a convertir",
+  "en mi religión",
+  "Tú eras todo y nada más",
+  "eras mi luz eras mi hogar",
+  "en medio de la soledad",
+  "una bendición",
+  "Pero algo extraño sucedió",
+  "el cuento de hadas se acabo",
+  "dijiste adiós",
+  "y me rompiste el corazón",
+  "Cuanto te quiero",
+  "cuanto te odio",
+  "cuanto te llevo", "en mis sentidos",
+  "si no te olvido",
+  "es por puro masoquismo",
+  "Cuanto te quiero",
+  "cuanto te odio",
+  "cuanto te llevo en mis sentidos",
+  "si no te olvido",
+  "es por puro masoquismo",
+  "Tú eras todo para mi",
+  "desde el principio",
+  "hasta el fin",
+  "no había como definir",
+  "todo este amor",
+  "Pero algo extraño sucedió",
+  "el cuento de hadas se acabo",
+  "dijiste adiós",
+  "y me rompiste el corazón",
+  "Cuanto te quiero",
+  "cuanto te odio",
+  "cuanto te llevo en mis sentidos",
+  "si no te olvido",
+  "es por puro masoquismo",
+  "Cuanto te quiero",
+  "cuanto te odio",
+  "cuanto te llevo en mis sentidos",
+  "si no te olvido",
+  "es por puro masoquismo")
+
+# se hace un tibble
+maso_df <- tibble(line = 1:42, texto = maso)
+
+# tibble de dos columnas 
+maso_df <- maso_df %>%
+  unnest_tokens(word, texto)
+
+#### stop_words en español
+tm_stop_words <- bind_rows(data_frame(word = tm::stopwords("spanish"),
+                                      lexicon = "custom"))
+
+maso_df_0 <- maso_df %>% 
+  anti_join(tm_stop_words)
+
+maso_df_0 %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 2) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col(fill = "#b3e2cd") +
+  labs(title = "Frecuencia de palabras en la cancion MASOQUISMO", 
+       x = "FRECUENCIA", y = " ", color = "", size = 30) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 20, face = "bold", color = "#88398A")) +
+  theme(axis.title.y = element_text(size = 18, face="bold", color = "#88398A"),
+        axis.title.x = element_text(size = 18, face="bold", color = "#88398A"),
+        axis.text = element_text(size = 16, face="bold", color = "#88398A"))
+
+
+maso_df_1 <- maso_df_0 %>%
+  count(word, sort = TRUE) 
+
+library(wordcloud2)
+
+wordcloud(
+  words = maso_df_1$word,
+  freq = maso_df_1$n,
+  min.freq =1,
+  max.words=200,
+  random.order=TRUE,
+  rot.per=0.35,
+  colors=brewer.pal(8, "Spectral")
+)
+
+wordcloud2(data=maso_df_1, size= 1)
+
+wordcloud2(maso_df_1, size=1, color=rep_len( c("#fb8072","#bebada"), nrow(maso_df_1) ) )
+
+
+#Ya fue
+
+ya_fue <- c(
+  "Ya fue, se terminó",
+  "No hubo gritos, ni reproches",
+  "Ni portazos, ni tampoco un sin ti me muero",
+  "Ya fue, y nunca volverá",
+  "Y por momentos se me da la vuelta tanta rebeldía",
+  "Me cuesta aprender a llorar",
+  "Y ahora solo me queda cuidar de mi pena",
+  "Para que no se convierta en puñales",
+  "Y se quede a vivir en mi saliva",
+  "Solo espero que esta vez entre la rabia y la tristeza",
+  "No hagan una fiesta de disfraces dentro de mí",
+  "Ya fue, se terminó",
+  "No hubo gritos, ni reproches",
+  "Ni portazos, ni tampoco un sin ti me muero",
+  "Ya fue y nunca volverá",
+  "Y por momentos se me da la vuelta tanta rebeldía",
+  "Me cuesta aprender a llorar",
+  "Y me alegro y me animo",
+  "Se que sigue mi camino",
+  "Y al pasar por donde andábamos",
+  "Todo vuelve a parar",
+  "Y en el fondo algo me dice",
+  "Que aunque el aire sea tan frío",
+  "Hay dolores que me ayudan a crecer",
+  "Aunque se desde hace tiempo",
+  "Ando huyendo del vacío",
+  "No me olvido de las cosas que encontré",
+  "Ya fue, se terminó",
+  "No hubo gritos, ni reproches",
+  "Ni portazos, ni tampoco un sin tí me muero",
+  "Ya fue, y nunca volverá",
+  "Y por momentos se me da la vuelta tanta rebeldía",
+  "Me cuesta aprender a poder llorar",
+  "Ya fue, se terminó",
+  "No hubo gritos, ni reproches, ni portazos",
+  "Aunque hubo algun sin tí me muero (qué le vamos a hacer)",
+  "Y ya fue, y nunca volverá (o eso dije la última vez)",
+  "Y por momentos se me da la vuelta tanta rebeldía",
+  "Que difícil es desaprender",
+  "Voy despacio para llegar lejos",
+  "Y ando lejos de donde empecé",
+  "Que difícil Que difícil Que difícil es",
+  "Desaprender"
+  
+)
+
+# se hace un tibble
+ya_fue_df <- tibble(line = 1:43, texto = ya_fue)
+# tibble de dos columnas 
+ya_fue_df <- ya_fue_df %>%
+  unnest_tokens(word, texto)
+
+#### stop_words en español
+tm_stop_words <- bind_rows(data_frame(word = tm::stopwords("spanish"),
+                                      lexicon = "custom"))
+
+ya_fue_df_0 <- ya_fue_df %>% 
+  anti_join(tm_stop_words)
+
+ya_fue_df_0 %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 2) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col(fill = "#8d99ae") +
+  labs(title = "Frecuencia de palabras de YA FUE", 
+       x = "FRECUENCIA", y = " ", color = "", size = 40) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 20, face = "bold", color = "#88398A")) +
+  theme(axis.title.y = element_text(size = 18, face="bold", color = "#88398A"),
+        axis.title.x = element_text(size = 18, face="bold", color = "#88398A"),
+        axis.text = element_text(size = 16, face="bold", color = "#88398A"))
+
+
+ya_fue_df_1 <- ya_fue_df_0 %>%
+  count(word, sort = TRUE) 
+
+wordcloud(
+  words = ya_fue_df_1$word,
+  freq = ya_fue_df_1$n,
+  min.freq =1,
+  max.words=200,
+  random.order=TRUE,
+  rot.per=0.35,
+  colors=brewer.pal(8, "PuOr")
+)
+
+wordcloud2(data=maso_df_1, size= 1)
+
+wordcloud2(ya_fue_df_1, size=1.5, color=rep_len( c("#fb8072","#bebada","#80b1d3"), nrow(ya_fue_df_1) ) )
+
+
+
+
+
